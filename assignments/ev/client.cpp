@@ -5,11 +5,13 @@
 #include "assignments/ev/euclidean_vector.h"
 
 int main() {
+ // std::cout << "whats going on";
   EuclideanVector a(2);
 
   std::vector<double> l{1, 2, 3};
-  EuclideanVector b{l.begin(), l.end()};
-
+ // EuclideanVector b{l.cbegin(), l.cend()};
+  //std::cout << (b == a) << std::endl;
+  /*
   std::vector<double> v2{4, 5, 6, 7};
   EuclideanVector c{v2.begin(), v2.end()};
 
@@ -64,5 +66,7 @@ int main() {
 
   for (auto d : lj) {
     std::cout << d << '\n';
-  }
+  }*/
+
+  return 0;
 }
