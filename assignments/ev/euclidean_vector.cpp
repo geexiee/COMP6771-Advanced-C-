@@ -5,6 +5,7 @@
 
 // MEMBER OVERLOADS ################################
 // copy assignment
+// testing github again
 EuclideanVector EuclideanVector::operator=(const EuclideanVector& original) {
         EuclideanVector temp = EuclideanVector(original.dimensions_);
         for (auto i = 0; i < original.dimensions_; ++i) {
