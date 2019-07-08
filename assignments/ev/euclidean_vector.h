@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <iterator>
+#include <list>
 
 class EuclideanVectorError : public std::exception {
  public:
@@ -20,12 +22,12 @@ class EuclideanVector {
     // CONSTRUCTORS
     // default constructor
     explicit EuclideanVector(int dimensions = 1) : EuclideanVector{dimensions, 0} {
-        std::cout << dimensions;
+        //std::cout << "default constructor called " << dimensions << std::endl;
     }
 
     // regular constructor
     EuclideanVector(int dimensions, double magnitudes) : dimensions_{dimensions}, magnitudes_{std::make_unique<double[]>(dimensions)} {
-        //std::cout << dimensions << " " << magnitudes_ << std::endl;
+       // std::cout << "regular constructor called" << std::endl;
         for (auto j = 0; j < dimensions; ++j) {
             magnitudes_[j] = magnitudes;
         }
@@ -33,70 +35,119 @@ class EuclideanVector {
 
     // iterator constructor
     EuclideanVector(std::vector<double>::const_iterator begin, std::vector<double>::const_iterator end) {
-        std::cout << "why";
-        int count = 0;
+       // std::cout << "iterator constructor called" << std::endl;
+        int n_dimensions = 0;
         for (auto iter = begin; iter != end; ++iter) {
-            magnitudes_[count] = *iter;
-            count++;
+            n_dimensions++;
         }
-        dimensions_ = count;
+        dimensions_ = n_dimensions;
+        magnitudes_ = std::make_unique<double[]>(n_dimensions);
+        auto index = 0;
+        for (auto iter = begin; iter != end; ++iter) {
+            magnitudes_[index] = *iter;
+            ++index;
+        }
     }
 
     // copy constructor
     EuclideanVector(const EuclideanVector& original) : dimensions_(original.dimensions_) {
+     //   std::cout << "copy constructor called" << std::endl;
+        magnitudes_ = std::make_unique<double[]>(original.dimensions_);
         for (int i = 0; i < original.dimensions_; ++i) {
             magnitudes_[i] = original.magnitudes_[i];
         }
     }
 
-    // move constructor
-    EuclideanVector(EuclideanVector&& original) noexcept : dimensions_(std::move(original.dimensions_)) {
-        for (int i = 0; i < original.dimensions_; ++i) {
-            magnitudes_[i] = original.magnitudes_[i];
-        }
-        original.magnitudes_ = nullptr;
-        original.dimensions_ = 0;
+    EuclideanVector(EuclideanVector&& o) noexcept : dimensions_{o.dimensions_}, magnitudes_{std::move(o.magnitudes_)} {
+     //   std::cout << "move constructor called" << std::endl;
+        o.dimensions_ = 0;
     }
 
-    // = operator
-    EuclideanVector& operator=(const EuclideanVector& original);
 
+    // INTERNAL OPERATORS #############################################################################################
+
+    // copy operator
+    EuclideanVector operator=(const EuclideanVector& original);
     // move operator
     EuclideanVector& operator=(EuclideanVector&& original) noexcept;
-
-    // += operator, STILL NEED TO IMPLEMENT ERROR HANDLING FOR WHEN DIMENSION DIFF
+    // other operators, STILL NEED TO IMPLEMENT ERROR HANDLING FOR WHEN DIMENSION DIFF
     EuclideanVector& operator+=(const EuclideanVector& e);
     EuclideanVector& operator-=(const EuclideanVector& e);
     EuclideanVector& operator*=(const int& n);
     EuclideanVector& operator/=(const int& n);
+    double& operator[](const int index);
+    double operator[](const int index) const;
+    // vector type conversion
+    explicit operator std::vector<double>() {
+     //   std::cout << "vector converter called" << std::endl;
+        std::vector<double> temp;
+        for (auto i = 0; i < this->dimensions_; ++i) {
+            temp.emplace_back(this->magnitudes_[i]);
+        }
+        return temp;
+    }
+    // List type conversion
+    explicit operator std::list<double>() {
+    //    std::cout << "list converter called" << std::endl;
+        std::list<double> temp;
+        for (auto i = 0; i < this->dimensions_; ++i) {
+            temp.emplace_back(this->magnitudes_[i]);
+        }
+        return temp;
+    }
 
 
-    // + operator/friend,  STILL NEED TO IMPLEMENT ERROR HANDLING FOR WHEN DIMENSION DIFF
+    // + operator/friend,  STILL NEED TO IMPLEMENT ERROR HANDLING FOR WHEN DIMENSION DIFF ##############################################
     friend bool operator==(const EuclideanVector& v1, const EuclideanVector& v2);
     friend bool operator!=(const EuclideanVector& v1, const EuclideanVector& v2);
     friend EuclideanVector operator+(const EuclideanVector& v1, const EuclideanVector& v2);
     friend EuclideanVector operator-(const EuclideanVector& v1, const EuclideanVector& v2);
     friend double operator*(const EuclideanVector& v1, const EuclideanVector& v2);
     friend EuclideanVector operator*(const EuclideanVector& v1, const int& n);
+    friend EuclideanVector operator*(const int& n, const EuclideanVector& v1);
     friend EuclideanVector operator/(const EuclideanVector& v1, const int& n);
-
-
-
+    friend std::ostream& operator<<(std::ostream& os, const EuclideanVector& v);
 
     // destructor
     ~EuclideanVector() noexcept = default;
 
-    //friend std::ostream& operator<<(std::ostream& os, const EuclideanVector& v);
-
-    // methods
+    // methods ##############################################################################################
+    double at(const int& n) const {
+        if (n < 0 || n >= dimensions_) {
+            throw EuclideanVectorError("Index X is not valid for this EuclideanVector object");
+        }
+        return magnitudes_[n];
+    }
+    double& at(const int& n) {
+        if (n < 0 || n >= dimensions_) {
+            throw EuclideanVectorError("Index X is not valid for this EuclideanVector object");
+        }
+        return magnitudes_[n];
+    }
     int GetNumDimensions() { return dimensions_;}
-    double at(const int& n) { return magnitudes_[n];}
     double GetEuclideanNorm() {
+        if (this->GetNumDimensions() == 0) {
+            throw EuclideanVectorError("EuclideanVector with no dimensions does not have a norm");
+        }
         double sum = 0;
         for (auto i = 0; i < dimensions_; ++i) {
             sum = sum + pow(magnitudes_[i], 2);
         }
         return sqrt(sum);
+    }
+    EuclideanVector CreateUnitVector() {
+        if (this->GetNumDimensions() == 0) {
+            throw EuclideanVectorError("EuclideanVector with no dimensions does not have a unit vector");
+        }
+        if (this->GetEuclideanNorm() == 0) {
+            throw  EuclideanVectorError("EuclideanVector with euclidean normal of 0 does not have a unit vector");
+        }
+        double norm = this->GetEuclideanNorm();
+        EuclideanVector temp(dimensions_);
+        for (auto i = 0; i < dimensions_; ++i) {
+            temp.magnitudes_[i] = this->magnitudes_[i]/norm;
+        }
+        return temp;
     }
 
  private:

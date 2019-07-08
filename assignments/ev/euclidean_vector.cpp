@@ -1,50 +1,64 @@
 #include "assignments/ev/euclidean_vector.h"
 
+#include <cassert>
 #include <algorithm>  // Look at these - they are helpful https://en.cppreference.com/w/cpp/algorithm
 
 // MEMBER OVERLOADS ################################
 // copy assignment
-EuclideanVector& EuclideanVector::operator=(const EuclideanVector& original) {
-    EuclideanVector temp{original};
-    std::swap(temp, *this);
-    return *this;
+EuclideanVector EuclideanVector::operator=(const EuclideanVector& original) {
+        EuclideanVector temp = EuclideanVector(original.dimensions_);
+        for (auto i = 0; i < original.dimensions_; ++i) {
+            temp.magnitudes_[i] = original.magnitudes_[i];
+        }
+        return temp;
 }
 
 // move assignment
 EuclideanVector& EuclideanVector::operator=(EuclideanVector&& original) noexcept {
-    dimensions_ = 0; // this line is probably wrong, figure out how to clear the current value ofdimension better pls
+    magnitudes_ = std::move(original.magnitudes_);
     dimensions_ = original.dimensions_;
-    for (auto i = 0; i < dimensions_; ++i) {
-        magnitudes_[i] = original.magnitudes_[i];
-    }
-    original.magnitudes_ = nullptr;
+    original.dimensions_ = 0;
     return *this;
 }
 
+// [] operator for reading
+double EuclideanVector::operator[](const int index) const {
+    assert(index < this->dimensions_ && index >= 0);
+    return this->magnitudes_[index];
+}
+
+// [] operator for writing
+double& EuclideanVector::operator[](const int index) {
+    assert(index < this->dimensions_ && index >= 0);
+    return this->magnitudes_[index];
+}
+
 // += operator
-EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e){
-    if (e.dimensions_ == dimensions_) {
-        for (auto i = 0; i < e.dimensions_; ++i) {
-            magnitudes_[i] = magnitudes_[i] + e.magnitudes_[i];
-        }
-        return *this;
+EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e) {
+  //  std::cout << "+= operator called" << std::endl;
+    if (e.dimensions_ != this->dimensions_) {
+        throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    }
+    for (auto i = 0; i < e.dimensions_; ++i) {
+        magnitudes_[i] = magnitudes_[i] + e.magnitudes_[i];
     }
     return *this;
 }
 
 // -= operator
-EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e){
-    if (e.dimensions_ == dimensions_) {
-        for (auto i = 0; i < e.dimensions_; ++i) {
-            magnitudes_[i] = magnitudes_[i] - e.magnitudes_[i];
-        }
-        return *this;
+EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e) {
+//    std::cout << "-= operator called" << std::endl;
+    if (e.dimensions_ != this->dimensions_) {
+        throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    }
+    for (auto i = 0; i < e.dimensions_; ++i) {
+        magnitudes_[i] = magnitudes_[i] - e.magnitudes_[i];
     }
     return *this;
 }
 
 // *= operator
-EuclideanVector& EuclideanVector::operator*=(const int& n){
+EuclideanVector& EuclideanVector::operator*=(const int& n) {
     for (auto i = 0; i < dimensions_; ++i) {
         magnitudes_[i] = magnitudes_[i] * n;
     }
@@ -53,6 +67,10 @@ EuclideanVector& EuclideanVector::operator*=(const int& n){
 
 // /= operator
 EuclideanVector& EuclideanVector::operator/=(const int& n){
+ //   std::cout << "/= operator called" << std::endl;
+    if (n == 0) {
+        throw EuclideanVectorError("Invalid vector division by 0");
+    }
     for (auto i = 0; i < dimensions_; ++i) {
         magnitudes_[i] = magnitudes_[i] / n;
     }
@@ -121,7 +139,7 @@ double operator*(const EuclideanVector& v1, const EuclideanVector& v2){
     return dot_product;
 }
 
-// * operator (scalar)
+// * operator (scalar second)
 EuclideanVector operator*(const EuclideanVector& v1, const int& n){
     EuclideanVector v = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
@@ -130,6 +148,16 @@ EuclideanVector operator*(const EuclideanVector& v1, const int& n){
     return v;
 }
 
+// * operator (scalar first)
+EuclideanVector operator*(const int& n, const EuclideanVector& v1){
+    EuclideanVector v = EuclideanVector{v1.dimensions_};
+    for (auto i = 0; i < v1.dimensions_; ++i) {
+        v.magnitudes_[i] = (v1.magnitudes_[i] * n);
+    }
+    return v;
+}
+
+
 // / operator
 EuclideanVector operator/(const EuclideanVector& v1, const int& n){
     EuclideanVector v = EuclideanVector{v1.dimensions_};
@@ -137,6 +165,17 @@ EuclideanVector operator/(const EuclideanVector& v1, const int& n){
         v.magnitudes_[i] = (v1.magnitudes_[i] / n);
     }
     return v;
+}
+
+// << operator
+std::ostream& operator<<(std::ostream& os, const EuclideanVector& v) {
+ //   std::cout << "<< operator called" << std::endl;
+    os << "[";
+    for (auto i = 0; i < v.dimensions_; ++i) {
+        os << v.magnitudes_[i] << " ";
+    }
+    os << "]";
+    return os;
 }
 
 
