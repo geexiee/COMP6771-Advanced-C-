@@ -175,7 +175,7 @@ std::ostream& operator<<(std::ostream& os, const EuclideanVector& v) {
     for (auto i = 0; i < v.dimensions_; ++i) {
         os << v.magnitudes_[i] << " ";
     }
-    os << "]";
+    os <<  "]";
     return os;
 }
 
