@@ -23,8 +23,7 @@
  everything I implemented behaves normally in both cases (ensuring const correctness). However, I
  will not test using a const EV for methods/operators that need to alter the calling EV, as that
  will always create an error (since the calling EV shouldn't even try to alter itself if it is
- const). Some features I didn't test with the const EV include +=, -=, *=, /=, setting at(),
- list/vector type conversion
+ const). Some features I didn't test with the const EV include +=, -=, *=, /= and setting at()
 
  The first few tests were all on the constructors and [] operator, which I did first because they
  were the most important to use in further testing (e.g. using the constructors and [] to
