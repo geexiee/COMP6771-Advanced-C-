@@ -35,6 +35,7 @@
 */
 
 #include "assignments/ev/euclidean_vector.h"
+
 #include "catch.h"
 
 SCENARIO("Checking that the default constructor works") {
