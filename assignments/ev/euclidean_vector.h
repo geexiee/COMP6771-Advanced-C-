@@ -20,7 +20,7 @@ class EuclideanVectorError : public std::exception {
 
 class EuclideanVector {
  public:
-    // CONSTRUCTORS ###########################################################################################
+    // CONSTRUCTORS
 
     // default constructor
     explicit EuclideanVector(int dimensions = 1) : EuclideanVector{dimensions, 0} {
@@ -66,11 +66,11 @@ class EuclideanVector {
     // default destructor
     ~EuclideanVector() noexcept = default;
 
-    // MEMBER FUNCTIONS ######################################################
+    // MEMBER FUNCTIONS
 
-    // copy operator
+    // copy operator (used to copy one EV to another)
     EuclideanVector& operator=(const EuclideanVector& original) noexcept;
-    // move operator
+    // move operator (used to move everything from one EV to another, so the original becomes empty)
     EuclideanVector& operator=(EuclideanVector&& original) noexcept;
     // += operator
     EuclideanVector& operator+=(const EuclideanVector& e);
@@ -103,7 +103,7 @@ class EuclideanVector {
         return temp;
     }
 
-    // FRIENDS                    ###############################################
+    // FRIENDS
 
     // == operator to check if two EVs are identical. Returns true if they are, false otherwise
     friend bool operator==(const EuclideanVector& v1, const EuclideanVector& v2) noexcept {
@@ -191,7 +191,7 @@ class EuclideanVector {
         return os;
     }
 
-    // METHODS ###########################################################################
+    // METHODS
 
     // at method to get the value at a certain index in an EV. Throws exception if the index is out of bounds
     double at(const int& n) const {
