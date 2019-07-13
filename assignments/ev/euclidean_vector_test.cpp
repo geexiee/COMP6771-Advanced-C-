@@ -60,7 +60,7 @@ SCENARIO("Checking that the default constructor works using the default value 1 
         EuclideanVector default_ev;
         WHEN("You check that the vector is constructed") {
             double e1 = default_ev[0];
-            THEN("The number of dimensions should be 3 and each magnitude should be 0") {
+            THEN("The number of dimensions should be 1 and each magnitude should be 0") {
                 REQUIRE(e1 == 0);
                 REQUIRE(default_ev.GetNumDimensions() == 1);
             }
@@ -105,11 +105,15 @@ SCENARIO("Checking that the copy constructor works") {
         EuclideanVector og(3, 3);
         WHEN("You try to copy it to another Euclidean Vector") {
             EuclideanVector copy{og};
-            THEN("You should successfully construct a EV with the same values as the original") {
+            THEN("You should successfully construct a EV with the same values as the original and original still exists") {
                 REQUIRE(copy[0] == 3);
                 REQUIRE(copy[1] == 3);
                 REQUIRE(copy[2] == 3);
                 REQUIRE(copy.GetNumDimensions() == 3);
+                REQUIRE(og[0] == 3);
+                REQUIRE(og[1] == 3);
+                REQUIRE(og[2] == 3);
+                REQUIRE(og.GetNumDimensions() == 3);
             }
         }
     }
@@ -659,7 +663,7 @@ SCENARIO("Trying to use * (dot product) friend operator on two EVs with a differ
 }
 
 SCENARIO("Trying to divide an EV by 0") {
-    GIVEN("Two an EV") {
+    GIVEN("An Euclidean Vector") {
         std::vector<double> v1 = {1, 2, 3};
         EuclideanVector ev1{v1.begin(), v1.end()};
         WHEN("I try to use the / operator to divide the EV by 0") {
@@ -975,7 +979,7 @@ SCENARIO("Using == to test equality of two different const EuclideanVectors") {
         std::vector<double> v3 = {2, 3, 4};
         const EuclideanVector ev1{v1.begin(), v1.end()};
         const EuclideanVector ev3{v3.begin(), v3.end()};
-        WHEN("You try to use the == operator to see if they are not identical") {
+        WHEN("You try to use the == operator to see if they are identical") {
             bool same = v1==v3;
             THEN("The result should return false") {
                 REQUIRE(same == false);
@@ -1055,9 +1059,9 @@ SCENARIO("Using the dot product multiplication operator (*) on 2 const Euclidean
         std::vector<double> v2 = {2, 3, 4};
         const EuclideanVector ev2{v2.begin(), v2.end()};
         WHEN("You try to multiply an the two EVs together to find the dot product") {
-            double dotproduct = ev2*ev1;
+            double dot_product = ev2*ev1;
             THEN("The resulting value should equal the dot product of the two EVs") {
-                REQUIRE(dotproduct == 20);
+                REQUIRE(dot_product == 20);
             }
         }
     }
@@ -1197,7 +1201,7 @@ SCENARIO("Trying to use * (dot product) friend operator on two const EVs with a 
 }
 
 SCENARIO("Trying to divide a const EV by 0") {
-    GIVEN("Two an EV") {
+    GIVEN("A const EV") {
         std::vector<double> v1 = {1, 2, 3};
         const EuclideanVector ev1{v1.begin(), v1.end()};
         WHEN("I try to use the / operator to divide the EV by 0") {

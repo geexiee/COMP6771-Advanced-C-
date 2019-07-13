@@ -73,24 +73,24 @@ class EuclideanVector {
 
   // MEMBER FUNCTIONS
 
-  // copy operator (used to copy one EV to another)
+  // copy assignment (used to copy one EV to another)
   EuclideanVector& operator=(const EuclideanVector& original) noexcept;
-  // move operator (used to move everything from one EV to another, so the original becomes empty)
+  // move assignment (used to move everything from one EV to another, so the original becomes empty)
   EuclideanVector& operator=(EuclideanVector&& original) noexcept;
-  // += operator
+  // += operator for adding vectors of the same dimension. Throws an exception if dimensions are different
   EuclideanVector& operator+=(const EuclideanVector& e);
-  // -= operator
+  // -= operator for subtracting vectors of the same dimension. Throws an exception if dimensions are different
   EuclideanVector& operator-=(const EuclideanVector& e);
-  // *= operator
+  // *= operator for multiplying each magnitude of an EV by a scalar
   EuclideanVector& operator*=(const int& n) noexcept;
-  // /= operator
+  // /= operator for dividing each magnitude of an EV by a scalar. Throws an exception if trying to divide by 0
   EuclideanVector& operator/=(const int& n);
   // [] operator for writing/setting values
   double& operator[](int index) noexcept;
   // [] operator for reading values
   double operator[](int index) const noexcept;
 
-  // Vector type conversion
+  // Vector type conversion (converts EV to std::vector)
   explicit operator std::vector<double>() const noexcept {
     std::vector<double> temp;
     for (auto i = 0; i < this->dimensions_; ++i) {
@@ -99,7 +99,7 @@ class EuclideanVector {
     return temp;
   }
 
-  // List type conversion
+  // List type conversion (converts EV to std::list)
   explicit operator std::list<double>() const noexcept {
     std::list<double> temp;
     for (auto i = 0; i < this->dimensions_; ++i) {
