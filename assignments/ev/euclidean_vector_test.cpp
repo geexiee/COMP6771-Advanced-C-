@@ -1,6 +1,3 @@
-#include "assignments/ev/euclidean_vector.h"
-
-#include <strstream>
 /*
 
   == Explanation and rational of testing ==
