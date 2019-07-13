@@ -21,7 +21,7 @@
  To ensure correctness of my program, I wanted to test each constructor, operator, and method.
  For each one, I want to test it with both a const and non const Euclidean vector, to ensure that everything
  I implemented behaves normally in both cases (ensuring const correctness). However, I will not test using a const EV for
- methods/operators that need to alter the calling EV, as that will always fail (since the calling EV shouldn't even try to
+ methods/operators that need to alter the calling EV, as that will always create an error (since the calling EV shouldn't even try to
  alter itself if it is const). Some features I didn't test with the const EV include +=, -=, *=, /=,
  setting at(), list/vector type conversion
 
@@ -842,6 +842,37 @@ SCENARIO("Using the vector subtraction operator on two const Euclidean Vectors")
                 REQUIRE(diff[1] == -1);
                 REQUIRE(diff[2] == -1);
                 REQUIRE(diff.GetNumDimensions() == 3);
+            }
+        }
+    }
+}
+
+SCENARIO("Using Vector type conversion on a const EuclideanVector") {
+    GIVEN("A Euclidean Vector {1,2,3}") {
+        std::vector<double> v = {1, 2, 3};
+        const EuclideanVector ev{v.begin(), v.end()};
+        WHEN("You try to cast it to a vector") {
+            std::vector<double> vect = std::vector<double>{ev};
+            THEN("The resulting vector should have all the same values as the original Euclidean Vector") {
+                REQUIRE(vect[0] == 1);
+                REQUIRE(vect[1] == 2);
+                REQUIRE(vect[2] == 3);
+                REQUIRE(vect.size() == 3);
+            }
+        }
+    }
+}
+
+SCENARIO("Using List type conversion on a const EuclideanVector") {
+    GIVEN("A Euclidean Vector {1,2}") {
+        std::vector<double> v = {1, 2};
+        EuclideanVector ev{v.begin(), v.end()};
+        WHEN("You try to cast it to a list") {
+            std::list<double> list = std::list<double>{ev};
+            THEN("The resulting vector should have all the same values as the original Euclidean Vector") {
+                REQUIRE(list.front() == 1);
+                REQUIRE(list.back() == 2);
+                REQUIRE(list.size() == 2);
             }
         }
     }

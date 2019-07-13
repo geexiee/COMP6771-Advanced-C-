@@ -58,6 +58,7 @@ class EuclideanVector {
         }
     }
 
+    // move constructor (as given in specs)
     EuclideanVector(EuclideanVector&& o) noexcept : dimensions_{o.dimensions_}, magnitudes_{std::move(o.magnitudes_)} {
         o.dimensions_ = 0;
     }
