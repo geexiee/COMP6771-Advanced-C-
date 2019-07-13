@@ -4,62 +4,54 @@
 #include <algorithm>  // Look at these - they are helpful https://en.cppreference.com/w/cpp/algorithm
 
 // MEMBER OVERLOADS ################################
+
 // copy assignment
-// testing github again
-EuclideanVector EuclideanVector::operator=(const EuclideanVector& original) {
-        EuclideanVector temp = EuclideanVector(original.dimensions_);
-        for (auto i = 0; i < original.dimensions_; ++i) {
-            temp.magnitudes_[i] = original.magnitudes_[i];
-        }
-        return temp;
+EuclideanVector& EuclideanVector::operator=(const EuclideanVector& original) noexcept {
+        EuclideanVector copy{original};
+        std::swap(copy, *this);
+        return *this;
 }
 
-// move assignment
+// move assignment (as given in specs)
 EuclideanVector& EuclideanVector::operator=(EuclideanVector&& original) noexcept {
     magnitudes_ = std::move(original.magnitudes_);
-    dimensions_ = original.dimensions_;
+    dimensions_ = original.GetNumDimensions();
     original.dimensions_ = 0;
     return *this;
 }
 
 // [] operator for reading
-double EuclideanVector::operator[](const int index) const {
+double EuclideanVector::operator[](const int index) const noexcept{
     assert(index < this->dimensions_ && index >= 0);
     return this->magnitudes_[index];
 }
 
 // [] operator for writing
-double& EuclideanVector::operator[](const int index) {
+double& EuclideanVector::operator[](const int index) noexcept{
     assert(index < this->dimensions_ && index >= 0);
     return this->magnitudes_[index];
 }
 
 // += operator
 EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e) {
-  //  std::cout << "+= operator called" << std::endl;
-    if (e.dimensions_ != this->dimensions_) {
-        throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
-    }
-    for (auto i = 0; i < e.dimensions_; ++i) {
-        magnitudes_[i] = magnitudes_[i] + e.magnitudes_[i];
+    if (e.dimensions_ != this->dimensions_) throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    for (auto i = 0; i < e.GetNumDimensions(); ++i) {
+        magnitudes_[i] = magnitudes_[i] + e[i];
     }
     return *this;
 }
 
 // -= operator
 EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e) {
-//    std::cout << "-= operator called" << std::endl;
-    if (e.dimensions_ != this->dimensions_) {
-        throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
-    }
-    for (auto i = 0; i < e.dimensions_; ++i) {
-        magnitudes_[i] = magnitudes_[i] - e.magnitudes_[i];
+    if (e.dimensions_ != this->dimensions_) throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    for (auto i = 0; i < e.GetNumDimensions(); ++i) {
+        magnitudes_[i] = magnitudes_[i] - e[i];
     }
     return *this;
 }
 
 // *= operator
-EuclideanVector& EuclideanVector::operator*=(const int& n) {
+EuclideanVector& EuclideanVector::operator*=(const int& n) noexcept {
     for (auto i = 0; i < dimensions_; ++i) {
         magnitudes_[i] = magnitudes_[i] * n;
     }
@@ -68,115 +60,37 @@ EuclideanVector& EuclideanVector::operator*=(const int& n) {
 
 // /= operator
 EuclideanVector& EuclideanVector::operator/=(const int& n){
- //   std::cout << "/= operator called" << std::endl;
-    if (n == 0) {
-        throw EuclideanVectorError("Invalid vector division by 0");
-    }
+    if (n == 0) throw EuclideanVectorError("Invalid vector division by 0");
     for (auto i = 0; i < dimensions_; ++i) {
         magnitudes_[i] = magnitudes_[i] / n;
     }
     return *this;
 }
 
+// METHOD DEFINITIONS
 
-// FRIEND OVERLOADS #######################################
-// == operator
-bool operator==(const EuclideanVector& v1, const EuclideanVector& v2){
-    if (v1.dimensions_ == v2.dimensions_) {
-        for (auto i = 0; i < v1.dimensions_; ++i) {
-            if (v1.magnitudes_[i] != v2.magnitudes_[i]) return false;
-        }
-        return true;
+// Returns a Euclidean vector equal to the unit vector of the euclidean vector it was called from
+EuclideanVector EuclideanVector::CreateUnitVector() const {
+    // Exception handling
+    if (this->GetNumDimensions() == 0) throw EuclideanVectorError("EuclideanVector with no dimensions does not have a unit vector");
+    if (this->GetEuclideanNorm() == 0) throw  EuclideanVectorError("EuclideanVector with euclidean normal of 0 does not have a unit vector");
+
+    // getting the euclidean norm of the EV so we can calculate the values of the unit vector
+    double norm = this->GetEuclideanNorm();
+    // constructing an EV of the same size and filling it in with the correct magnitudes (the corresponding magnitudes divided by the norm)
+    EuclideanVector temp(dimensions_);
+    for (auto i = 0; i < dimensions_; ++i) {
+        temp[i] = this->magnitudes_[i]/norm;
     }
-    return false;
+    return temp;
 }
 
-// != operator
-bool operator!=(const EuclideanVector& v1, const EuclideanVector& v2){
-    if (v1.dimensions_ == v2.dimensions_) {
-        for (auto i = 0; i < v1.dimensions_; ++i) {
-            if (v1.magnitudes_[i] != v2.magnitudes_[i]) return true;
-        }
-        return false;
+// calculates and returns the euclidean norm of an euclidean vector as a double
+double EuclideanVector::GetEuclideanNorm() const {
+    if (this->GetNumDimensions() == 0) throw EuclideanVectorError("EuclideanVector with no dimensions does not have a norm");
+    double sum = 0;
+    for (auto i = 0; i < dimensions_; ++i) {
+        sum = sum + pow(magnitudes_[i], 2);
     }
-    return true;
+    return std::sqrt(sum);
 }
-
-// + operator,  STILL NEED TO IMPLEMENT ERROR HANDLING FOR WHEN DIMENSION DIFF
-EuclideanVector operator+(const EuclideanVector& v1, const EuclideanVector& v2) {
-    EuclideanVector compilerpleaser = EuclideanVector{v1.dimensions_}; // just to make compiler happy for now
-    if (v1.dimensions_ == v2.dimensions_) {
-        EuclideanVector sum = EuclideanVector{v1.dimensions_};
-        for (auto i = 0; i < v1.dimensions_; ++i) {
-            sum.magnitudes_[i] = v1.magnitudes_[i] + v2.magnitudes_[i];
-        }
-        return sum;
-    }
-    return compilerpleaser;
-}
-
-// - operator
-EuclideanVector operator-(const EuclideanVector& v1, const EuclideanVector& v2){
-    EuclideanVector compilerpleaser = EuclideanVector{v1.dimensions_}; // just to make compiler happy for now
-    if (v1.dimensions_ == v2.dimensions_) {
-        EuclideanVector v = EuclideanVector{v1.dimensions_};
-        for (auto i = 0; i < v1.dimensions_; ++i) {
-            v.magnitudes_[i] = v1.magnitudes_[i] - v2.magnitudes_[i];
-        }
-        return v;
-    }
-    return compilerpleaser;
-}
-
-// * operator (vector dot product)
-double operator*(const EuclideanVector& v1, const EuclideanVector& v2){
-    double dot_product = 0;
-    if (v1.dimensions_ == v2.dimensions_) {
-        for (auto i = 0; i < v1.dimensions_; ++i) {
-            dot_product = dot_product + (v2.magnitudes_[i]*v1.magnitudes_[i]);
-        }
-        return dot_product;
-    }
-    return dot_product;
-}
-
-// * operator (scalar second)
-EuclideanVector operator*(const EuclideanVector& v1, const int& n){
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
-    for (auto i = 0; i < v1.dimensions_; ++i) {
-        v.magnitudes_[i] = (v1.magnitudes_[i] * n);
-    }
-    return v;
-}
-
-// * operator (scalar first)
-EuclideanVector operator*(const int& n, const EuclideanVector& v1){
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
-    for (auto i = 0; i < v1.dimensions_; ++i) {
-        v.magnitudes_[i] = (v1.magnitudes_[i] * n);
-    }
-    return v;
-}
-
-
-// / operator
-EuclideanVector operator/(const EuclideanVector& v1, const int& n){
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
-    for (auto i = 0; i < v1.dimensions_; ++i) {
-        v.magnitudes_[i] = (v1.magnitudes_[i] / n);
-    }
-    return v;
-}
-
-// << operator
-std::ostream& operator<<(std::ostream& os, const EuclideanVector& v) {
- //   std::cout << "<< operator called" << std::endl;
-    os << "[";
-    for (auto i = 0; i < v.dimensions_; ++i) {
-        os << v.magnitudes_[i] << " ";
-    }
-    os <<  "]";
-    return os;
-}
-
-
