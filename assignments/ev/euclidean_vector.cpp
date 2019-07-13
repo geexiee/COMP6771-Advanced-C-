@@ -23,30 +23,34 @@ EuclideanVector& EuclideanVector::operator=(EuclideanVector&& original) noexcept
 
 // [] operator for reading
 double EuclideanVector::operator[](const int index) const noexcept {
+  // ensure that the index isn't out of bounds
   assert(index < this->dimensions_ && index >= 0);
   return this->magnitudes_[index];
 }
 
 // [] operator for writing
 double& EuclideanVector::operator[](const int index) noexcept {
+  // ensure the index isn't out of bounds
   assert(index < this->dimensions_ && index >= 0);
   return this->magnitudes_[index];
 }
 
-// += operator
+// += operator, throws an exception if the two EVs are different sizes
 EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e) {
   if (e.dimensions_ != this->dimensions_)
     throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+  // add the other EVs magnitudes to our current one
   for (auto i = 0; i < e.GetNumDimensions(); ++i) {
     magnitudes_[i] = magnitudes_[i] + e[i];
   }
   return *this;
 }
 
-// -= operator
+// -= operator, throws an exception if the two EVs are different sizes
 EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e) {
   if (e.dimensions_ != this->dimensions_)
     throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+  // subtract the other EVs magnitudes from our current one
   for (auto i = 0; i < e.GetNumDimensions(); ++i) {
     magnitudes_[i] = magnitudes_[i] - e[i];
   }
@@ -55,16 +59,18 @@ EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e) {
 
 // *= operator
 EuclideanVector& EuclideanVector::operator*=(const int& n) noexcept {
+  // multiply each magnitude by the scalar
   for (auto i = 0; i < dimensions_; ++i) {
     magnitudes_[i] = magnitudes_[i] * n;
   }
   return *this;
 }
 
-// /= operator
+// /= operator, throws an exception when dividing by 0
 EuclideanVector& EuclideanVector::operator/=(const int& n) {
   if (n == 0)
     throw EuclideanVectorError("Invalid vector division by 0");
+  // divide each magnitude by the scalar
   for (auto i = 0; i < dimensions_; ++i) {
     magnitudes_[i] = magnitudes_[i] / n;
   }
@@ -75,7 +81,7 @@ EuclideanVector& EuclideanVector::operator/=(const int& n) {
 
 // Returns a Euclidean vector equal to the unit vector of the euclidean vector it was called from
 EuclideanVector EuclideanVector::CreateUnitVector() const {
-  // Exception handling
+  // Exception handling for when we try to use this on a zero vector
   if (this->GetNumDimensions() == 0)
     throw EuclideanVectorError("EuclideanVector with no dimensions does not have a unit vector");
   if (this->GetEuclideanNorm() == 0)
@@ -94,10 +100,12 @@ EuclideanVector EuclideanVector::CreateUnitVector() const {
 }
 
 // calculates and returns the euclidean norm of an euclidean vector as a double
+// throws exception if it doesn't have any dimensions
 double EuclideanVector::GetEuclideanNorm() const {
   if (this->GetNumDimensions() == 0)
     throw EuclideanVectorError("EuclideanVector with no dimensions does not have a norm");
   double sum = 0;
+  // getting the sum of squares of each dimension
   for (auto i = 0; i < dimensions_; ++i) {
     sum = sum + pow(magnitudes_[i], 2);
   }

@@ -136,7 +136,9 @@ class EuclideanVector {
   friend EuclideanVector operator+(const EuclideanVector& v1, const EuclideanVector& v2) {
     if (v1.GetNumDimensions() != v2.GetNumDimensions())
       throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    // construct a euclidean vector of the same size
     EuclideanVector sum = EuclideanVector{v1.dimensions_};
+    // fill the newly constructed EV with magnitudes equal to the sum of the others
     for (auto i = 0; i < v1.dimensions_; ++i) {
       sum[i] = v1[i] + v2[i];
     }
@@ -147,11 +149,11 @@ class EuclideanVector {
   friend EuclideanVector operator-(const EuclideanVector& v1, const EuclideanVector& v2) {
     if (v1.GetNumDimensions() != v2.GetNumDimensions())
       throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
+    EuclideanVector subtract = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
-      v[i] = v1[i] - v2[i];
+      subtract[i] = v1[i] - v2[i];
     }
-    return v;
+    return subtract;
   }
 
   // * operator to find the dot product of 2 EVs. Throws exception if the two EVs have different
@@ -168,20 +170,20 @@ class EuclideanVector {
 
   // * operator to multiply an EV by a scalar, where the scalar comes after the *
   friend EuclideanVector operator*(const EuclideanVector& v1, const int& n) noexcept {
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
+    EuclideanVector product = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
-      v[i] = (v1[i] * n);
+      product[i] = (v1[i] * n);
     }
-    return v;
+    return product;
   }
 
   // * operator to multiply an EV by a scalar, where the scalar comes before the *
   friend EuclideanVector operator*(const int& n, const EuclideanVector& v1) noexcept {
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
+    EuclideanVector product = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
-      v[i] = (v1[i] * n);
+      product[i] = (v1[i] * n);
     }
-    return v;
+    return product;
   }
 
   // division operator to divide each dimension of an EV by a scalar. Throws exception if trying to
@@ -189,11 +191,11 @@ class EuclideanVector {
   friend EuclideanVector operator/(const EuclideanVector& v1, const int& n) {
     if (n == 0)
       throw EuclideanVectorError("Invalid vector division by 0");
-    EuclideanVector v = EuclideanVector{v1.dimensions_};
+    EuclideanVector quotient = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
-      v[i] = (v1[i] / n);
+      quotient[i] = (v1[i] / n);
     }
-    return v;
+    return quotient;
   }
 
   // output stream operator to print out the contents of an EV in the form [1,2,3]
