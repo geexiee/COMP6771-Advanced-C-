@@ -135,7 +135,7 @@ class EuclideanVector {
   // + operator to add two EVs. Throws exception if the two EVs have different dimensions
   friend EuclideanVector operator+(const EuclideanVector& v1, const EuclideanVector& v2) {
     if (v1.GetNumDimensions() != v2.GetNumDimensions())
-      throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+      throw EuclideanVectorError("Dimensions of LHS(" + std::to_string(v1.GetNumDimensions()) + ") and RHS(" + std::to_string(v2.GetNumDimensions()) + ") do not match");
     // construct a euclidean vector of the same size
     EuclideanVector sum = EuclideanVector{v1.dimensions_};
     // fill the newly constructed EV with magnitudes equal to the sum of the others
@@ -148,7 +148,7 @@ class EuclideanVector {
   // - operator to subtract 2 EVs. Throws exception if the two EVs have different dimensions
   friend EuclideanVector operator-(const EuclideanVector& v1, const EuclideanVector& v2) {
     if (v1.GetNumDimensions() != v2.GetNumDimensions())
-      throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+      throw EuclideanVectorError("Dimensions of LHS(" + std::to_string(v1.GetNumDimensions()) + ") and RHS(" + std::to_string(v2.GetNumDimensions()) + ") do not match");
     EuclideanVector subtract = EuclideanVector{v1.dimensions_};
     for (auto i = 0; i < v1.dimensions_; ++i) {
       subtract[i] = v1[i] - v2[i];
@@ -160,7 +160,7 @@ class EuclideanVector {
   // dimensions
   friend double operator*(const EuclideanVector& v1, const EuclideanVector& v2) {
     if (v1.GetNumDimensions() != v2.GetNumDimensions())
-      throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+      throw EuclideanVectorError("Dimensions of LHS(" + std::to_string(v1.GetNumDimensions()) + ") and RHS(" + std::to_string(v2.GetNumDimensions()) + ") do not match");
     double dot_product = 0;
     for (auto i = 0; i < v1.dimensions_; ++i) {
       dot_product = dot_product + (v2[i] * v1[i]);
@@ -216,7 +216,7 @@ class EuclideanVector {
   // bounds
   double at(const int& n) const {
     if (n < 0 || n >= dimensions_)
-      throw EuclideanVectorError("Index X is not valid for this EuclideanVector object");
+      throw EuclideanVectorError("Index " + std::to_string(n) +  " is not valid for this EuclideanVector object");
     return magnitudes_[n];
   }
 
@@ -224,7 +224,7 @@ class EuclideanVector {
   // bounds
   double& at(const int& n) {
     if (n < 0 || n >= dimensions_)
-      throw EuclideanVectorError("Index X is not valid for this EuclideanVector object");
+      throw EuclideanVectorError("Index " + std::to_string(n) +  " is not valid for this EuclideanVector object");
     return magnitudes_[n];
   }
 

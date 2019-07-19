@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <string>
 #include <utility>
 
 // MEMBER OVERLOADS
@@ -38,7 +39,7 @@ double& EuclideanVector::operator[](const int index) noexcept {
 // += operator, throws an exception if the two EVs are different sizes
 EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e) {
   if (e.dimensions_ != this->dimensions_)
-    throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    throw EuclideanVectorError("Dimensions of LHS(" + std::to_string(this->dimensions_) + ") and RHS(" + std::to_string(e.dimensions_) + ") do not match");
   // add the other EVs magnitudes to our current one
   for (auto i = 0; i < e.GetNumDimensions(); ++i) {
     magnitudes_[i] = magnitudes_[i] + e[i];
@@ -49,7 +50,7 @@ EuclideanVector& EuclideanVector::operator+=(const EuclideanVector& e) {
 // -= operator, throws an exception if the two EVs are different sizes
 EuclideanVector& EuclideanVector::operator-=(const EuclideanVector& e) {
   if (e.dimensions_ != this->dimensions_)
-    throw EuclideanVectorError("Dimensions of LHS(X) and RHS(Y) do not match");
+    throw EuclideanVectorError("Dimensions of LHS(" + std::to_string(this->dimensions_) + ") and RHS(" + std::to_string(e.dimensions_) + ") do not match");
   // subtract the other EVs magnitudes from our current one
   for (auto i = 0; i < e.GetNumDimensions(); ++i) {
     magnitudes_[i] = magnitudes_[i] - e[i];
